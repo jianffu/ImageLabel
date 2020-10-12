@@ -17,10 +17,10 @@ namespace ImageLabel
             InitializeComponent();
         }
 
-        string strPath;
-        string path;
-        List<string> nameList;
         string fileName;
+        string path;
+        string strPath;
+        List<string> nameList;
         private void ButtonBrowsePicDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog FBDialog = new FolderBrowserDialog();//创建FolderBrowserDialog对象
@@ -42,20 +42,14 @@ namespace ImageLabel
                 nameList = new List<string>();
                 Director(path, nameList);
 
-                try
-                {
-                    fileName = nameList[0];
-                    pictureBox1.Image = Image.FromFile(strPath + fileName);
-                    LabelFilename.Text = "./" + fileName;
-                }
-                catch (Exception) { }
+                BoxJumpIndex.Text = "0";
+                ButtonJumpIndex_Click(sender, e);
             }
         }
 
-
-        List<Tuple<String, String, int, int, int, int>> tupleList = new List<Tuple<String, String, int, int, int, int>>();
-        string labelDirectory;
         string destLabelFilePath;
+        string labelDirectory;
+        List<Tuple<String, String, int, int, int, int>> tupleList = new List<Tuple<String, String, int, int, int, int>>();
         private void ButtonBrowseAnnoPath_Click(object sender, EventArgs e)
         {
             var labelFileContent = string.Empty;
@@ -125,11 +119,6 @@ namespace ImageLabel
                         break;
                     }
             }
-            //获取子文件夹内的文件列表，递归遍历  
-            //foreach (DirectoryInfo dd in directs)
-            //{
-            //    Director(dd.FullName, list);
-            //}
         }
 
         int index = 0;
@@ -137,16 +126,49 @@ namespace ImageLabel
         {
             if (index < nameList.Count)
             {
-                fileName = nameList[++index];
-                pictureBox1.Image = Image.FromFile(strPath + fileName);
-                LabelFilename.Text = "./" + fileName;
-                index++;
+                BoxJumpIndex.Text = (index + 1).ToString();
+                ButtonJumpIndex_Click(sender, e);
             }
             else
             {
                 MessageBox.Show("当前图片为最后一张"); 
             }
-            
+        }
+
+        private void ButtonPrePic_Click(object sender, EventArgs e)
+        {
+            if (index >= 1)
+            {
+                BoxJumpIndex.Text = (index - 1).ToString();
+                ButtonJumpIndex_Click(sender, e);
+            }
+            else
+            {
+                MessageBox.Show("当前图片为第一张");
+            }
+        }
+
+        private void ButtonJumpIndex_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int jump = int.Parse(BoxJumpIndex.Text);
+                if (jump >= 0 && jump < nameList.Count)
+                {
+                    pictureBox1.Image = Image.FromFile(strPath + nameList[jump]);
+                    fileName = nameList[jump];
+                    LabelFilename.Text = "./" + fileName;
+                    index = jump;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException("标号超出限制！");
+                }
+            }
+            catch (Exception e1)
+            {
+                MessageBox.Show(e1.Message);
+            }
         }
     }
 }
