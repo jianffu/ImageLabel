@@ -16,6 +16,7 @@ namespace ImageLabel
         {
             InitializeComponent();
         }
+
         string strPath;
         string path;
         List<string> nameList;
@@ -41,9 +42,13 @@ namespace ImageLabel
                 nameList = new List<string>();
                 Director(path, nameList);
 
-                fileName = nameList[0];
-                pictureBox1.Image = Image.FromFile(strPath + fileName);
-                LabelFilename.Text = fileName;
+                try
+                {
+                    fileName = nameList[0];
+                    pictureBox1.Image = Image.FromFile(strPath + fileName);
+                    LabelFilename.Text = "./" + fileName;
+                }
+                catch (Exception) { }
             }
         }
 
@@ -105,15 +110,20 @@ namespace ImageLabel
             MessageBox.Show(labelDirectory, "File Content at path: " + labelFilePath, MessageBoxButtons.OK);
         }
 
-
         public void Director(string dir, List<string> list)
         {
             DirectoryInfo d = new DirectoryInfo(dir);
             FileInfo[] files = d.GetFiles();//文件
             DirectoryInfo[] directs = d.GetDirectories();//文件夹
+            string[] legalSuffixs = new string[] { "jpg", "jpeg", "png" };
             foreach (FileInfo f in files)
             {
-                list.Add(f.Name);//添加文件名到列表中  
+                foreach (string suffix in legalSuffixs)
+                    if (f.Name.EndsWith(suffix))
+                    {
+                        list.Add(f.Name);//添加文件名到列表中
+                        break;
+                    }
             }
             //获取子文件夹内的文件列表，递归遍历  
             //foreach (DirectoryInfo dd in directs)
@@ -129,7 +139,7 @@ namespace ImageLabel
             {
                 fileName = nameList[++index];
                 pictureBox1.Image = Image.FromFile(strPath + fileName);
-                LabelFilename.Text = fileName;
+                LabelFilename.Text = "./" + fileName;
                 index++;
             }
             else
