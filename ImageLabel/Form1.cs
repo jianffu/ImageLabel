@@ -20,7 +20,7 @@ namespace ImageLabel
         string path;
         List<string> nameList;
         string fileName;
-        private void button1_Click(object sender, EventArgs e)
+        private void ButtonBrowsePicDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog FBDialog = new FolderBrowserDialog();//创建FolderBrowserDialog对象
             if (FBDialog.ShowDialog() == DialogResult.OK)//判断是否选择了文件夹
@@ -28,12 +28,12 @@ namespace ImageLabel
                 strPath = FBDialog.SelectedPath;//记录选择的文件夹
                 if (strPath.EndsWith("\\"))//说明对于磁盘如C盘等SelectedPath返回的是C:\\
                 {
-                    textBox1.Text = strPath;//用textBox记录获取的路径
+                    BoxPicDir.Text = strPath;//用textBox记录获取的路径
 
                 }
                 else//对于一般磁盘下的文件返回的是如C:\\user没有\\结尾的文件夹路径
-                { 
-                    textBox1.Text = strPath + "\\";
+                {
+                    BoxPicDir.Text = strPath + "\\";
                     strPath += "\\";
                 }
 
@@ -41,14 +41,15 @@ namespace ImageLabel
                 nameList = new List<string>();
                 Director(path, nameList);
 
-
-
                 fileName = nameList[0];
-
                 pictureBox1.Image = Image.FromFile(strPath + fileName);
+                LabelFilename.Text = fileName;
             }
+        }
 
-            
+        private void ButtonBrowseAnnoPath_Click(object sender, EventArgs e)
+        {
+
         }
 
         public void Director(string dir, List<string> list)
@@ -67,18 +68,14 @@ namespace ImageLabel
             //}
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         int index = 0;
-        private void button2_Click(object sender, EventArgs e)
+        private void ButtonNextPic_Click(object sender, EventArgs e)
         {
             if (index < nameList.Count)
             {
                 fileName = nameList[++index];
                 pictureBox1.Image = Image.FromFile(strPath + fileName);
+                LabelFilename.Text = fileName;
                 index++;
             }
             else
@@ -86,11 +83,6 @@ namespace ImageLabel
                 MessageBox.Show("当前图片为最后一张"); 
             }
             
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
