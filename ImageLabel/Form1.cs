@@ -47,10 +47,64 @@ namespace ImageLabel
             }
         }
 
+
+        List<Tuple<String, String, int, int, int, int>> tupleList = new List<Tuple<String, String, int, int, int, int>>();
+        string labelDirectory;
+        string destLabelFilePath;
         private void ButtonBrowseAnnoPath_Click(object sender, EventArgs e)
         {
+            var labelFileContent = string.Empty;
+            var labelFilePath = string.Empty;
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "c:\\";
+                openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
 
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+                    labelFilePath = openFileDialog.FileName;
+
+                    //Read the contents of the file into a stream
+                    var fileStream = openFileDialog.OpenFile();
+
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        string line;
+                        string[] strArr;
+                        string defalutLabel = "未打电话";
+                        
+                        
+                        // 从文件读取并显示行，直到文件的末尾 
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            strArr = line.Split(' ');
+                            tupleList.Add(Tuple.Create(strArr[0], defalutLabel, int.Parse(strArr[2]), int.Parse(strArr[3]), int.Parse(strArr[4]), int.Parse(strArr[5])));
+                        }
+                    }
+                    int no = labelFilePath.LastIndexOf('\\');
+                    labelDirectory = labelFilePath.Substring(0, no + 1);
+                    destLabelFilePath = labelDirectory + "labelFile.txt";
+                    string strLine;
+                    int length;
+                    using (StreamWriter sw = new StreamWriter(destLabelFilePath))
+                    {
+                        length = tupleList.Count;
+                        for (int i = 0; i < length; i++)
+                        {
+                            strLine = tupleList[i].Item1 + ' ' + tupleList[i].Item2 + ' ' + tupleList[i].Item3 + ' ' + tupleList[i].Item4 + ' ' + tupleList[i].Item5 + ' ' + tupleList[i].Item6;
+                            sw.WriteLine(strLine);
+                        }
+                        
+                    }
+                }
+            }
+            
+            MessageBox.Show(labelDirectory, "File Content at path: " + labelFilePath, MessageBoxButtons.OK);
         }
+
 
         public void Director(string dir, List<string> list)
         {
