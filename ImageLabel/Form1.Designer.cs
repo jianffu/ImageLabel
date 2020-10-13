@@ -28,8 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.PictureBox = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ButtonJumpIndex = new System.Windows.Forms.Button();
+            this.BoxJumpIndex = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.ButtonSaveAnno = new System.Windows.Forms.Button();
             this.ButtonBrowseAnnoPath = new System.Windows.Forms.Button();
             this.BoxAnnoPath = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -40,26 +44,22 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ButtonPrePic = new System.Windows.Forms.Button();
             this.ButtonNextPic = new System.Windows.Forms.Button();
-            this.ButtonSaveAnno = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.BoxJumpIndex = new System.Windows.Forms.TextBox();
-            this.ButtonJumpIndex = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // PictureBox
             // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.PictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.Location = new System.Drawing.Point(12, 124);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(778, 495);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.PictureBox.Location = new System.Drawing.Point(12, 130);
+            this.PictureBox.Name = "PictureBox";
+            this.PictureBox.Size = new System.Drawing.Size(778, 489);
+            this.PictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PictureBox.TabIndex = 0;
+            this.PictureBox.TabStop = false;
             // 
             // groupBox1
             // 
@@ -82,6 +82,48 @@
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "文件区";
+            // 
+            // ButtonJumpIndex
+            // 
+            this.ButtonJumpIndex.Location = new System.Drawing.Point(383, 71);
+            this.ButtonJumpIndex.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
+            this.ButtonJumpIndex.Name = "ButtonJumpIndex";
+            this.ButtonJumpIndex.Size = new System.Drawing.Size(40, 21);
+            this.ButtonJumpIndex.TabIndex = 13;
+            this.ButtonJumpIndex.Text = "跳转";
+            this.ButtonJumpIndex.UseVisualStyleBackColor = true;
+            this.ButtonJumpIndex.Click += new System.EventHandler(this.ButtonJumpIndex_Click);
+            // 
+            // BoxJumpIndex
+            // 
+            this.BoxJumpIndex.Location = new System.Drawing.Point(337, 71);
+            this.BoxJumpIndex.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
+            this.BoxJumpIndex.MaxLength = 6;
+            this.BoxJumpIndex.Name = "BoxJumpIndex";
+            this.BoxJumpIndex.Size = new System.Drawing.Size(40, 21);
+            this.BoxJumpIndex.TabIndex = 12;
+            this.BoxJumpIndex.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(212, 74);
+            this.label3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 6);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(119, 12);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "图片序号(从0开始)：";
+            // 
+            // ButtonSaveAnno
+            // 
+            this.ButtonSaveAnno.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonSaveAnno.Location = new System.Drawing.Point(885, 20);
+            this.ButtonSaveAnno.Name = "ButtonSaveAnno";
+            this.ButtonSaveAnno.Size = new System.Drawing.Size(93, 23);
+            this.ButtonSaveAnno.TabIndex = 10;
+            this.ButtonSaveAnno.Text = "保存标注结果";
+            this.ButtonSaveAnno.UseVisualStyleBackColor = true;
             // 
             // ButtonBrowseAnnoPath
             // 
@@ -185,48 +227,6 @@
             this.ButtonNextPic.UseVisualStyleBackColor = true;
             this.ButtonNextPic.Click += new System.EventHandler(this.ButtonNextPic_Click);
             // 
-            // ButtonSaveAnno
-            // 
-            this.ButtonSaveAnno.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonSaveAnno.Location = new System.Drawing.Point(885, 20);
-            this.ButtonSaveAnno.Name = "ButtonSaveAnno";
-            this.ButtonSaveAnno.Size = new System.Drawing.Size(93, 23);
-            this.ButtonSaveAnno.TabIndex = 10;
-            this.ButtonSaveAnno.Text = "保存标注结果";
-            this.ButtonSaveAnno.UseVisualStyleBackColor = true;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(212, 74);
-            this.label3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 6);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(119, 12);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "图片序号(从0开始)：";
-            // 
-            // BoxJumpIndex
-            // 
-            this.BoxJumpIndex.Location = new System.Drawing.Point(337, 71);
-            this.BoxJumpIndex.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.BoxJumpIndex.MaxLength = 6;
-            this.BoxJumpIndex.Name = "BoxJumpIndex";
-            this.BoxJumpIndex.Size = new System.Drawing.Size(40, 21);
-            this.BoxJumpIndex.TabIndex = 12;
-            this.BoxJumpIndex.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // ButtonJumpIndex
-            // 
-            this.ButtonJumpIndex.Location = new System.Drawing.Point(383, 71);
-            this.ButtonJumpIndex.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.ButtonJumpIndex.Name = "ButtonJumpIndex";
-            this.ButtonJumpIndex.Size = new System.Drawing.Size(40, 21);
-            this.ButtonJumpIndex.TabIndex = 13;
-            this.ButtonJumpIndex.Text = "跳转";
-            this.ButtonJumpIndex.UseVisualStyleBackColor = true;
-            this.ButtonJumpIndex.Click += new System.EventHandler(this.ButtonJumpIndex_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -234,10 +234,10 @@
             this.ClientSize = new System.Drawing.Size(1008, 631);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.PictureBox);
             this.Name = "Form1";
             this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -247,7 +247,7 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox PictureBox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox BoxPicDir;
         private System.Windows.Forms.Button ButtonBrowsePicDir;
