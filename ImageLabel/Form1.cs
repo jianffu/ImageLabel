@@ -155,7 +155,7 @@ namespace ImageLabel
                 int jump = int.Parse(BoxJumpIndex.Text);
                 if (jump >= 0 && jump < nameList.Count)
                 {
-                    pictureBox1.Image = Image.FromFile(strPath + nameList[jump]);
+                    PictureBox.Image = Image.FromFile(strPath + nameList[jump]);
                     fileName = nameList[jump];
                     LabelFilename.Text = "./" + fileName;
                     index = jump;
@@ -169,6 +169,16 @@ namespace ImageLabel
             {
                 MessageBox.Show(e1.Message);
             }
+        }
+
+        private void PictureBox_DrawRect(int x0, int y0, int x1, int y1)
+        {
+            Image img = PictureBox.Image;
+            Graphics g = Graphics.FromImage(img);
+            Pen pen = new Pen(Color.Yellow);
+            g.DrawRectangle(pen, new Rectangle(x0, y0, x1 - x0, y1 - y0));
+            g.Dispose();
+            PictureBox.Image = img;
         }
     }
 }
