@@ -17,43 +17,31 @@ namespace ImageLabel
             InitializeComponent();
         }
 
-        string fileName;
-        string path;
-        string strPath;
-        List<string> nameList;
+        ImageLib imglib = new ImageLib();
         private void ButtonBrowsePicDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog FBDialog = new FolderBrowserDialog();//创建FolderBrowserDialog对象
             if (FBDialog.ShowDialog() == DialogResult.OK)//判断是否选择了文件夹
             {
-                strPath = FBDialog.SelectedPath;//记录选择的文件夹
-                if (strPath.EndsWith("\\"))//说明对于磁盘如C盘等SelectedPath返回的是C:\\
-                {
-                    BoxPicDir.Text = strPath;//用textBox记录获取的路径
-
-                }
-                else//对于一般磁盘下的文件返回的是如C:\\user没有\\结尾的文件夹路径
-                {
-                    BoxPicDir.Text = strPath + "\\";
-                    strPath += "\\";
-                }
-
-                path = strPath;
-                nameList = new List<string>();
-                Director(path, nameList);
-
+                string path= FBDialog.SelectedPath;//记录选择的文件夹
+                imglib.imageFromDirector(path);
+                BoxPicDir.Text = imglib.directorPath;//用textBox记录获取的路径
                 BoxJumpIndex.Text = "0";
-                ButtonJumpIndex_Click(sender, e);
+                PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[0]);
+            }
+            if (imglib.isChanged == 1)
+            {
+                imglib.savelabel();
+                pictureBox_Draw(index);
             }
         }
 
-        string destLabelFilePath;
-        string labelDirectory;
-        List<Tuple<String, String, int, int, int, int>> tupleList = new List<Tuple<String, String, int, int, int, int>>();
+       
+        
+        
+        
         private void ButtonBrowseAnnoPath_Click(object sender, EventArgs e)
         {
-            var labelFileContent = string.Empty;
-            var labelFilePath = string.Empty;
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.InitialDirectory = "c:\\";
@@ -64,8 +52,8 @@ namespace ImageLabel
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     //Get the path of specified file
-                    labelFilePath = openFileDialog.FileName;
-
+                    imglib.labelFilePath = openFileDialog.FileName;
+                    BoxAnnoPath.Text = imglib.labelFilePath;
                     //Read the contents of the file into a stream
                     var fileStream = openFileDialog.OpenFile();
 
@@ -74,57 +62,41 @@ namespace ImageLabel
                         string line;
                         string[] strArr;
                         string defalutLabel = "未打电话";
-                        
-                        
+                        string lastFileName = "";
+                        List<Tuple<String, int, int, int, int>> tupleList = new List<Tuple<String, int, int, int, int>>();
                         // 从文件读取并显示行，直到文件的末尾 
                         while ((line = reader.ReadLine()) != null)
                         {
                             strArr = line.Split(' ');
-                            tupleList.Add(Tuple.Create(strArr[0], defalutLabel, int.Parse(strArr[2]), int.Parse(strArr[3]), int.Parse(strArr[4]), int.Parse(strArr[5])));
+                            if (!lastFileName.Equals("") && !strArr[0].Equals(lastFileName))
+                            {
+                                imglib.addLabel(lastFileName, tupleList);
+                                tupleList = new List<Tuple<String, int, int, int, int>>();
+                            }
+                            tupleList.Add(Tuple.Create(defalutLabel, int.Parse(strArr[2]), int.Parse(strArr[3]), int.Parse(strArr[4]), int.Parse(strArr[5])));
+                            lastFileName = strArr[0];
+
                         }
+                        imglib.addLabel(lastFileName, tupleList);
+                        tupleList = new List<Tuple<String, int, int, int, int>>();
                     }
-                    int no = labelFilePath.LastIndexOf('\\');
-                    labelDirectory = labelFilePath.Substring(0, no + 1);
-                    destLabelFilePath = labelDirectory + "labelFile.txt";
-                    string strLine;
-                    int length;
-                    using (StreamWriter sw = new StreamWriter(destLabelFilePath))
+                    imglib.isChanged = 1;
+                    if (imglib.imgCount != 0)
                     {
-                        length = tupleList.Count;
-                        for (int i = 0; i < length; i++)
-                        {
-                            strLine = tupleList[i].Item1 + ' ' + tupleList[i].Item2 + ' ' + tupleList[i].Item3 + ' ' + tupleList[i].Item4 + ' ' + tupleList[i].Item5 + ' ' + tupleList[i].Item6;
-                            sw.WriteLine(strLine);
-                        }
-                        
+                        imglib.savelabel();
+                        pictureBox_Draw(index);
                     }
                 }
             }
             
-            MessageBox.Show(labelDirectory, "File Content at path: " + labelFilePath, MessageBoxButtons.OK);
         }
 
-        public void Director(string dir, List<string> list)
-        {
-            DirectoryInfo d = new DirectoryInfo(dir);
-            FileInfo[] files = d.GetFiles();//文件
-            DirectoryInfo[] directs = d.GetDirectories();//文件夹
-            string[] legalSuffixs = new string[] { "jpg", "jpeg", "png" };
-            foreach (FileInfo f in files)
-            {
-                foreach (string suffix in legalSuffixs)
-                    if (f.Name.EndsWith(suffix))
-                    {
-                        list.Add(f.Name);//添加文件名到列表中
-                        break;
-                    }
-            }
-        }
+
 
         int index = 0;
         private void ButtonNextPic_Click(object sender, EventArgs e)
         {
-            if (index < nameList.Count)
+            if (index < imglib.imgCount)
             {
                 BoxJumpIndex.Text = (index + 1).ToString();
                 ButtonJumpIndex_Click(sender, e);
@@ -153,12 +125,13 @@ namespace ImageLabel
             try
             {
                 int jump = int.Parse(BoxJumpIndex.Text);
-                if (jump >= 0 && jump < nameList.Count)
+                if (jump >= 0 && jump < imglib.imgCount)
                 {
-                    PictureBox.Image = Image.FromFile(strPath + nameList[jump]);
-                    fileName = nameList[jump];
-                    LabelFilename.Text = "./" + fileName;
+                    PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[jump]);
+                    
+                    LabelFilename.Text = "./" + imglib.imgNameList[jump];
                     index = jump;
+                    pictureBox_Draw(index);
                 }
                 else
                 {
@@ -171,14 +144,42 @@ namespace ImageLabel
             }
         }
 
-        private void PictureBox_DrawRect(int x0, int y0, int x1, int y1)
+        private void pictureBox_Draw(int picIndex)
+        {
+            List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
+            imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out valueList);
+            for (int i=0;i<valueList.Count;i++)
+            {
+                PictureBox_DrawRect(i, valueList[i].Item1, valueList[i].Item2, valueList[i].Item3, valueList[i].Item4, valueList[i].Item5);
+            }
+        }
+
+        private void PictureBox_DrawRect(int no,string label, int x0, int y0, int x1, int y1)
         {
             Image img = PictureBox.Image;
             Graphics g = Graphics.FromImage(img);
             Pen pen = new Pen(Color.Yellow);
             g.DrawRectangle(pen, new Rectangle(x0, y0, x1 - x0, y1 - y0));
+
+            // Create string to draw.
+            String drawString = no.ToString() + label;
+
+            // Create font and brush.
+            Font drawFont = new Font("Arial", 16);
+            SolidBrush drawBrush = new SolidBrush(Color.Red);
+
+            // Create point for upper-left corner of drawing.
+            float x = (float)(x0 + 1.0);
+            float y = (float)(y0 + 1.0);
+
+            g.DrawString(drawString, drawFont, drawBrush, x, y);
             g.Dispose();
             PictureBox.Image = img;
+        }
+
+        private void ButtonSaveAnno_Click(object sender, EventArgs e)
+        {
+            imglib.savelabel();
         }
     }
 }

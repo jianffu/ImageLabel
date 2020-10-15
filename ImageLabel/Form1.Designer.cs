@@ -40,7 +40,7 @@
             this.LabelFilename = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.BoxPicDir = new System.Windows.Forms.TextBox();
-            this.ButtonBrowsePicDir = new System.Windows.Forms.Button();
+            this.ButtonBrowserPicDir = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ButtonPrePic = new System.Windows.Forms.Button();
             this.ButtonNextPic = new System.Windows.Forms.Button();
@@ -75,7 +75,7 @@
             this.groupBox1.Controls.Add(this.LabelFilename);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.BoxPicDir);
-            this.groupBox1.Controls.Add(this.ButtonBrowsePicDir);
+            this.groupBox1.Controls.Add(this.ButtonBrowserPicDir);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(984, 112);
@@ -124,6 +124,7 @@
             this.ButtonSaveAnno.TabIndex = 10;
             this.ButtonSaveAnno.Text = "保存标注结果";
             this.ButtonSaveAnno.UseVisualStyleBackColor = true;
+            this.ButtonSaveAnno.Click += new System.EventHandler(this.ButtonSaveAnno_Click);
             // 
             // ButtonBrowseAnnoPath
             // 
@@ -182,15 +183,15 @@
             this.BoxPicDir.Size = new System.Drawing.Size(522, 21);
             this.BoxPicDir.TabIndex = 4;
             // 
-            // ButtonBrowsePicDir
+            // ButtonBrowserPicDir
             // 
-            this.ButtonBrowsePicDir.Location = new System.Drawing.Point(653, 20);
-            this.ButtonBrowsePicDir.Name = "ButtonBrowsePicDir";
-            this.ButtonBrowsePicDir.Size = new System.Drawing.Size(31, 21);
-            this.ButtonBrowsePicDir.TabIndex = 3;
-            this.ButtonBrowsePicDir.Text = "...";
-            this.ButtonBrowsePicDir.UseVisualStyleBackColor = true;
-            this.ButtonBrowsePicDir.Click += new System.EventHandler(this.ButtonBrowsePicDir_Click);
+            this.ButtonBrowserPicDir.Location = new System.Drawing.Point(653, 20);
+            this.ButtonBrowserPicDir.Name = "ButtonBrowserPicDir";
+            this.ButtonBrowserPicDir.Size = new System.Drawing.Size(31, 21);
+            this.ButtonBrowserPicDir.TabIndex = 3;
+            this.ButtonBrowserPicDir.Text = "...";
+            this.ButtonBrowserPicDir.UseVisualStyleBackColor = true;
+            this.ButtonBrowserPicDir.Click += new System.EventHandler(this.ButtonBrowsePicDir_Click);
             // 
             // groupBox2
             // 
@@ -250,7 +251,7 @@
         private System.Windows.Forms.PictureBox PictureBox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox BoxPicDir;
-        private System.Windows.Forms.Button ButtonBrowsePicDir;
+        private System.Windows.Forms.Button ButtonBrowserPicDir;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button ButtonPrePic;
         private System.Windows.Forms.Button ButtonNextPic;
