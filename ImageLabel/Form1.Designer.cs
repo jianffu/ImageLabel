@@ -44,6 +44,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ButtonPrePic = new System.Windows.Forms.Button();
             this.ButtonNextPic = new System.Windows.Forms.Button();
+            this.LabelFlow = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -197,6 +198,7 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.LabelFlow);
             this.groupBox2.Controls.Add(this.ButtonPrePic);
             this.groupBox2.Controls.Add(this.ButtonNextPic);
             this.groupBox2.Location = new System.Drawing.Point(796, 124);
@@ -228,6 +230,16 @@
             this.ButtonNextPic.UseVisualStyleBackColor = true;
             this.ButtonNextPic.Click += new System.EventHandler(this.ButtonNextPic_Click);
             // 
+            // LabelFlow
+            // 
+            this.LabelFlow.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LabelFlow.Location = new System.Drawing.Point(6, 78);
+            this.LabelFlow.Name = "LabelFlow";
+            this.LabelFlow.Size = new System.Drawing.Size(188, 411);
+            this.LabelFlow.TabIndex = 7;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -237,7 +249,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.PictureBox);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "ImageLabel";
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -264,6 +276,7 @@
         private System.Windows.Forms.Button ButtonJumpIndex;
         private System.Windows.Forms.TextBox BoxJumpIndex;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.FlowLayoutPanel LabelFlow;
     }
 }
 
