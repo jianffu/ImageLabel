@@ -13,7 +13,6 @@ namespace ImageLabel
         public List<string> imgNameList = new List<string>();
         public int imgCount = 0;
 
-        
         public void imageFromDirector(string dir)
         {
             directorPath = dir;
@@ -42,10 +41,12 @@ namespace ImageLabel
         public string labelFilePath;
         public int isChanged = 0;
         public Dictionary<string, List<Tuple<String, int, int, int, int>>> dic = new Dictionary<string, List<Tuple<String, int, int, int, int>>>();
+
         public void addLabel(string key, List<Tuple<String, int, int, int, int>> value)
         {
             dic.Add(key, value);
         }
+
         public void savelabel()
         {
             int no = labelFilePath.LastIndexOf('\\');
@@ -60,6 +61,9 @@ namespace ImageLabel
                 {
                     strPath = imgNameList[i];
                     dic.TryGetValue(strPath, out valueList);
+                    if (valueList is null)
+                        continue;
+
                     length = valueList.Count;
                     for (j = 0; j < length; j++)
                     {
@@ -67,7 +71,6 @@ namespace ImageLabel
                         sw.WriteLine(strLine);
                     }
                 }
-
             }
         }
     }

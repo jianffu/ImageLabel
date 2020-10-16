@@ -35,10 +35,6 @@ namespace ImageLabel
                 pictureBox_Draw(index);
             }
         }
-
-       
-        
-        
         
         private void ButtonBrowseAnnoPath_Click(object sender, EventArgs e)
         {
@@ -88,10 +84,7 @@ namespace ImageLabel
                     }
                 }
             }
-            
         }
-
-
 
         int index = 0;
         private void ButtonNextPic_Click(object sender, EventArgs e)
@@ -144,17 +137,33 @@ namespace ImageLabel
             }
         }
 
+        /// <summary>
+        /// 更新 PictureBox 的图片.
+        /// </summary>
+        /// <param name="picIndex">图片编号</param>
         private void pictureBox_Draw(int picIndex)
         {
             List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
             imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out valueList);
-            for (int i=0;i<valueList.Count;i++)
+            if (valueList is null)
+                return;
+
+            for (int i=0; i<valueList.Count; i++)
             {
                 PictureBox_DrawRect(i, valueList[i].Item1, valueList[i].Item2, valueList[i].Item3, valueList[i].Item4, valueList[i].Item5);
             }
         }
 
-        private void PictureBox_DrawRect(int no,string label, int x0, int y0, int x1, int y1)
+        /// <summary>
+        /// 在 PictureBox 中绘制一个盒.
+        /// </summary>
+        /// <param name="no">在盒中显示的编号</param>
+        /// <param name="label">盒标签</param>
+        /// <param name="x0"></param>
+        /// <param name="y0"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        private void PictureBox_DrawRect(int no, string label, int x0, int y0, int x1, int y1)
         {
             Image img = PictureBox.Image;
             Graphics g = Graphics.FromImage(img);
@@ -162,7 +171,7 @@ namespace ImageLabel
             g.DrawRectangle(pen, new Rectangle(x0, y0, x1 - x0, y1 - y0));
 
             // Create string to draw.
-            String drawString = no.ToString() + label;
+            string drawString = no.ToString() + label;
 
             // Create font and brush.
             Font drawFont = new Font("Arial", 16);
