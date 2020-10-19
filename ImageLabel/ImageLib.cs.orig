@@ -42,7 +42,11 @@ namespace ImageLabel
         public string labelFilePath;
         public int isChanged = 0;
         public Dictionary<string, List<Tuple<String, int, int, int, int>>> dic = new Dictionary<string, List<Tuple<String, int, int, int, int>>>();
+<<<<<<< HEAD
         public List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
+=======
+
+>>>>>>> a5587c7e95bf9511c0c453637d012fa277f7a6c6
         public void addLabel(string key, List<Tuple<String, int, int, int, int>> value)
         {
             dic.Add(key, value);

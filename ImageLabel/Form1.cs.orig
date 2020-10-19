@@ -38,7 +38,10 @@ namespace ImageLabel
                 pictureBox_Draw(index);
             }
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> a5587c7e95bf9511c0c453637d012fa277f7a6c6
         
         private void ButtonBrowseAnnoPath_Click(object sender, EventArgs e)
         {
@@ -150,9 +153,18 @@ namespace ImageLabel
         /// <param name="picIndex">图片编号</param>
         private void pictureBox_Draw(int picIndex)
         {
-            //List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
+<<<<<<< HEAD
+           
             imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out imglib.valueList);
             for (int i=0;i< imglib.valueList.Count;i++)
+=======
+            List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
+            imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out valueList);
+            if (valueList is null)
+                return;
+
+            for (int i=0; i<valueList.Count; i++)
+>>>>>>> a5587c7e95bf9511c0c453637d012fa277f7a6c6
             {
                 PictureBox_DrawRect(i, imglib.valueList[i].Item1, imglib.valueList[i].Item2, imglib.valueList[i].Item3, imglib.valueList[i].Item4, imglib.valueList[i].Item5);
             }
@@ -175,7 +187,11 @@ namespace ImageLabel
             g.DrawRectangle(pen, new Rectangle(x0, y0, x1 - x0, y1 - y0));
 
             // Create string to draw.
-            String drawString = no.ToString() + label;
+<<<<<<< HEAD
+            String drawString = no.ToString();    //+ label
+=======
+            string drawString = no.ToString() + label;
+>>>>>>> a5587c7e95bf9511c0c453637d012fa277f7a6c6
 
             // Create font and brush.
             Font drawFont = new Font("Arial", 16);

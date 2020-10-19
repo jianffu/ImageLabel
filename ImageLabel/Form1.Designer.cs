@@ -249,7 +249,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.PictureBox);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "ImageLabel";
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
