@@ -15,11 +15,21 @@ namespace ImageLabel
         public Form1()
         {
             InitializeComponent();
-            imglib.getClassList();
 
+            imglib.getClassList();
             InitDataGridView();
         }
-       
+
+        /// <summary>
+        /// 窗体退出事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            imglib.savelabel();
+        }
+
         ImageLib imglib = new ImageLib();
         private void ButtonBrowsePicDir_Click(object sender, EventArgs e)
         {
@@ -152,6 +162,8 @@ namespace ImageLabel
         {
             //List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
             imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out imglib.valueList);
+            if (imglib.valueList is null)
+                return;
             for (int i=0;i< imglib.valueList.Count;i++)
             {
                 PictureBox_DrawRect(i, imglib.valueList[i].Item1, imglib.valueList[i].Item2, imglib.valueList[i].Item3, imglib.valueList[i].Item4, imglib.valueList[i].Item5);
@@ -214,7 +226,6 @@ namespace ImageLabel
                 colShow.Items.Add(imglib.classList[j]);
             }
 
-
             colShow.DisplayIndex = 1;
             dataGridView1.Columns.Insert(1, colShow);
             //dataGridView1.Rows[1].Cells[1].Value = imglib.classList[2];
@@ -237,7 +248,9 @@ namespace ImageLabel
         }
 
         private void startDataGridView()
-        { 
+        {
+            if (imglib.valueList is null)
+                return;
             int rowsNum = imglib.valueList.Count;
             dataGridView1.Rows.Clear();
             for (int i = 0; i < rowsNum; i++)
