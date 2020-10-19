@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
 
 namespace ImageLabel
 {
@@ -42,6 +43,7 @@ namespace ImageLabel
         public string labelFilePath;
         public int isChanged = 0;
         public Dictionary<string, List<Tuple<String, int, int, int, int>>> dic = new Dictionary<string, List<Tuple<String, int, int, int, int>>>();
+        public List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
         public void addLabel(string key, List<Tuple<String, int, int, int, int>> value)
         {
             dic.Add(key, value);
@@ -68,6 +70,33 @@ namespace ImageLabel
                     }
                 }
 
+            }
+        }
+
+        string classListPath = "ClassList.txt";
+        public List<string> classList = new List<string>();
+        public void getClassList()
+        {
+            try
+            {
+                // Create an instance of StreamReader to read from a file.
+                // The using statement also closes the StreamReader.
+                using (StreamReader sr = new StreamReader(classListPath))
+                {
+                    string line;
+                    // Read and display lines from the file until the end of
+                    // the file is reached.
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        line.Trim();
+                        classList.Add(line);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Let the user know what went wrong.
+                MessageBox.Show("The file could not be read:", e.Message);
             }
         }
     }

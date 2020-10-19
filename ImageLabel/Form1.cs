@@ -15,8 +15,11 @@ namespace ImageLabel
         public Form1()
         {
             InitializeComponent();
-        }
+            imglib.getClassList();
 
+            InitDataGridView();
+        }
+       
         ImageLib imglib = new ImageLib();
         private void ButtonBrowsePicDir_Click(object sender, EventArgs e)
         {
@@ -36,9 +39,6 @@ namespace ImageLabel
             }
         }
 
-       
-        
-        
         
         private void ButtonBrowseAnnoPath_Click(object sender, EventArgs e)
         {
@@ -85,6 +85,7 @@ namespace ImageLabel
                     {
                         imglib.savelabel();
                         pictureBox_Draw(index);
+                        startDataGridView();
                     }
                 }
             }
@@ -122,6 +123,7 @@ namespace ImageLabel
 
         private void ButtonJumpIndex_Click(object sender, EventArgs e)
         {
+            imglib.savelabel();
             try
             {
                 int jump = int.Parse(BoxJumpIndex.Text);
@@ -132,6 +134,7 @@ namespace ImageLabel
                     LabelFilename.Text = "./" + imglib.imgNameList[jump];
                     index = jump;
                     pictureBox_Draw(index);
+                    startDataGridView();
                 }
                 else
                 {
@@ -146,11 +149,11 @@ namespace ImageLabel
 
         private void pictureBox_Draw(int picIndex)
         {
-            List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
-            imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out valueList);
-            for (int i=0;i<valueList.Count;i++)
+           
+            imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out imglib.valueList);
+            for (int i=0;i< imglib.valueList.Count;i++)
             {
-                PictureBox_DrawRect(i, valueList[i].Item1, valueList[i].Item2, valueList[i].Item3, valueList[i].Item4, valueList[i].Item5);
+                PictureBox_DrawRect(i, imglib.valueList[i].Item1, imglib.valueList[i].Item2, imglib.valueList[i].Item3, imglib.valueList[i].Item4, imglib.valueList[i].Item5);
             }
         }
 
@@ -162,7 +165,7 @@ namespace ImageLabel
             g.DrawRectangle(pen, new Rectangle(x0, y0, x1 - x0, y1 - y0));
 
             // Create string to draw.
-            String drawString = no.ToString() + label;
+            String drawString = no.ToString();    //+ label
 
             // Create font and brush.
             Font drawFont = new Font("Arial", 16);
@@ -180,6 +183,57 @@ namespace ImageLabel
         private void ButtonSaveAnno_Click(object sender, EventArgs e)
         {
             imglib.savelabel();
+        }
+
+        private void InitDataGridView()
+        {
+            
+            dataGridView1.AllowUserToAddRows = false;
+            DataGridViewTextBoxColumn col1 = new DataGridViewTextBoxColumn();
+            col1.Name = "No";
+            col1.HeaderText = "序号";
+            col1.Width = 60;
+            dataGridView1.Columns.Insert(0, col1);
+
+            DataGridViewComboBoxColumn colShow = new DataGridViewComboBoxColumn();
+            colShow.Name = "label";
+            colShow.HeaderText = "标签";
+            colShow.Width = 100;
+            for (int j = 0; j < imglib.classList.Count; j++)
+            {
+                colShow.Items.Add(imglib.classList[j]);
+            }
+
+
+            colShow.DisplayIndex = 1;
+            dataGridView1.Columns.Insert(1, colShow);
+            //dataGridView1.Rows[1].Cells[1].Value = imglib.classList[2];
+            dataGridView1.CellValueChanged -= dataGridView1_CellValueChanged;//line added after solution given
+            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;//line added after solution given
+        }
+
+        //datagridview内嵌控件值修改事件
+        private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            int columnIndex = e.ColumnIndex;
+            int rowIndex = e.RowIndex;
+            string newValue = dataGridView1.Rows[rowIndex].Cells[columnIndex].Value.ToString();
+            
+            if (dataGridView1.Columns[columnIndex].Name == "label" && !imglib.valueList[rowIndex].Item1.Equals(newValue))
+            {
+                imglib.valueList[rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
+                imglib.dic[imglib.imgNameList[index]][rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
+            }
+        }
+
+        private void startDataGridView()
+        { 
+            int rowsNum = imglib.valueList.Count;
+            dataGridView1.Rows.Clear();
+            for (int i = 0; i < rowsNum; i++)
+            {
+                dataGridView1.Rows.Add(i, imglib.valueList[i].Item1);
+            }
         }
     }
 }
