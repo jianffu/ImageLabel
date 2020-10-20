@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace ImageLabel
 {
@@ -18,10 +19,17 @@ namespace ImageLabel
         public string labelFilePath;
         public List<string> imgNameList = new List<string>();
         public List<string> classList = new List<string>();
+        public Dictionary<string, Color> colorDict = new Dictionary<string, Color>();
         public List<Tuple<string, int, int, int, int>> valueList = new List<Tuple<string, int, int, int, int>>();
-        public Dictionary<string, List<Tuple<string, int, int, int, int>>> dic = new Dictionary<string, List<Tuple<string, int, int, int, int>>>();
+        public Dictionary<string, List<Tuple<string, int, int, int, int>>> dict = new Dictionary<string, List<Tuple<string, int, int, int, int>>>();
 
-        public void imageFromDirector(string dir)
+        public ImageLib()
+        {
+            GetClassList();
+            InitializeColorDict();
+        }
+
+        public void ImageFromDirector(string dir)
         {
             directorPath = dir;
             if (!directorPath.EndsWith("\\"))//说明对于磁盘如C盘等SelectedPath返回的是C:\\
@@ -31,7 +39,7 @@ namespace ImageLabel
             
             DirectoryInfo d = new DirectoryInfo(dir);
             FileInfo[] files = d.GetFiles();//文件
-            DirectoryInfo[] directs = d.GetDirectories();//文件夹
+            _ = d.GetDirectories();//文件夹
             string[] legalSuffixs = new string[] { "jpg", "jpeg", "png" };
             foreach (FileInfo f in files)
             {
@@ -45,29 +53,28 @@ namespace ImageLabel
             imgCount = imgNameList.Count;
         }
 
-        public void addLabel(string key, List<Tuple<string, int, int, int, int>> value)
+        public void AddLabel(string key, List<Tuple<string, int, int, int, int>> value)
         {
-            dic.Add(key, value);
+            dict.Add(key, value);
         }
 
-        public void savelabel()
+        public void SaveLabel()
         {
-            if (labelFilePath is null)
-            {
-                return;
-            }
-            int no = labelFilePath.LastIndexOf('\\');
-            
-            destLabelFilePath = labelFilePath.Substring(0, no + 1) + "labelFile.txt";
+            if (labelFilePath is null) return;
+
+            //int no = labelFilePath.LastIndexOf('\\');
+            //destLabelFilePath = labelFilePath.Substring(0, no + 1) + "labelFile.txt";
+            destLabelFilePath = labelFilePath;
+
             string strLine;
-            List<Tuple<string, int, int, int, int>> valueList = new List<Tuple<string, int, int, int, int>>();
+            _ = new List<Tuple<string, int, int, int, int>>();
             int i;int j;int length; string strPath;
             using (StreamWriter sw = new StreamWriter(destLabelFilePath))
             {
                 for ( i = 0; i < imgCount; i++)
                 {
                     strPath = imgNameList[i];
-                    dic.TryGetValue(strPath, out valueList);
+                    dict.TryGetValue(strPath, out List<Tuple<string, int, int, int, int>> valueList);
                     if (valueList is null)
                         continue;
 
@@ -81,7 +88,21 @@ namespace ImageLabel
             }
         }
 
-        public void getClassList()
+        public void InitializeLabels()
+        {
+            foreach (var picBoxList in dict.Values)
+            {
+                if (picBoxList is null) continue;
+                for (int i=0; i<picBoxList.Count; i++)
+                {
+                    var box = picBoxList[i];
+                    picBoxList[i] = Tuple.Create(classList[0], box.Item2, box.Item3, box.Item4, box.Item5);
+                }
+            }
+        }
+
+        #region private
+        private void GetClassList()
         {
             try
             {
@@ -105,5 +126,16 @@ namespace ImageLabel
                 MessageBox.Show("The file could not be read:", e.Message);
             }
         }
+
+        private void InitializeColorDict()
+        {
+            var colors = new Color[] { Color.Red, Color.Yellow, Color.Green, Color.Blue, Color.Purple };
+            int idx = 0;
+            foreach (string label in classList)
+            {
+                colorDict.Add(label, colors[idx++]);
+            }
+        }
+        #endregion
     }
 }

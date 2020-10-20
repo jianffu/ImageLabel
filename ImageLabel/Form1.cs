@@ -19,7 +19,6 @@ namespace ImageLabel
         {
             InitializeComponent();
 
-            imglib.getClassList();
             InitDataGridView();
         }
 
@@ -30,14 +29,14 @@ namespace ImageLabel
             if (FBDialog.ShowDialog() == DialogResult.OK)//判断是否选择了文件夹
             {
                 string path= FBDialog.SelectedPath;//记录选择的文件夹
-                imglib.imageFromDirector(path);
+                imglib.ImageFromDirector(path);
                 BoxPicDir.Text = imglib.directorPath;//用textBox记录获取的路径
                 BoxJumpIndex.Text = "0";
                 PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[0]);
             }
             if (imglib.isChanged == 1)
             {
-                imglib.savelabel();
+                imglib.SaveLabel();
                 pictureBox_Draw(index);
             }
         }
@@ -63,7 +62,6 @@ namespace ImageLabel
                     {
                         string line;
                         string[] strArr;
-                        string defalutLabel = "未打电话";
                         string lastFileName = "";
                         List<Tuple<string, int, int, int, int>> tupleList = new List<Tuple<string, int, int, int, int>>();
                         // 从文件读取并显示行，直到文件的末尾 
@@ -72,20 +70,19 @@ namespace ImageLabel
                             strArr = line.Split(' ');
                             if (!lastFileName.Equals("") && !strArr[0].Equals(lastFileName))
                             {
-                                imglib.addLabel(lastFileName, tupleList);
+                                imglib.AddLabel(lastFileName, tupleList);
                                 tupleList = new List<Tuple<string, int, int, int, int>>();
                             }
-                            tupleList.Add(Tuple.Create(defalutLabel, int.Parse(strArr[2]), int.Parse(strArr[3]), int.Parse(strArr[4]), int.Parse(strArr[5])));
+                            tupleList.Add(Tuple.Create(strArr[1], int.Parse(strArr[2]), int.Parse(strArr[3]), int.Parse(strArr[4]), int.Parse(strArr[5])));
                             lastFileName = strArr[0];
-
                         }
-                        imglib.addLabel(lastFileName, tupleList);
+                        imglib.AddLabel(lastFileName, tupleList);
                         tupleList = new List<Tuple<string, int, int, int, int>>();
                     }
                     imglib.isChanged = 1;
                     if (imglib.imgCount != 0)
                     {
-                        imglib.savelabel();
+                        imglib.SaveLabel();
                         pictureBox_Draw(index);
                         startDataGridView();
                     }
@@ -128,7 +125,7 @@ namespace ImageLabel
 
         private void ButtonJumpIndex_Click(object sender, EventArgs e)
         {
-            imglib.savelabel();
+            imglib.SaveLabel();
             try
             {
                 int jump = int.Parse(BoxJumpIndex.Text);
@@ -154,7 +151,12 @@ namespace ImageLabel
 
         private void ButtonSaveAnno_Click(object sender, EventArgs e)
         {
-            imglib.savelabel();
+            imglib.SaveLabel();
+        }
+
+        private void ButtonInitAnno_Click(object sender, EventArgs e)
+        {
+            imglib.InitializeLabels();
         }
         #endregion
 
@@ -166,12 +168,18 @@ namespace ImageLabel
         private void pictureBox_Draw(int picIndex)
         {
             //List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
-            imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out imglib.valueList);
+            imglib.dict.TryGetValue(imglib.imgNameList[picIndex], out imglib.valueList);
             if (imglib.valueList is null)
                 return;
-            for (int i=0;i< imglib.valueList.Count;i++)
+            for (int i=0; i < imglib.valueList.Count; i++)
             {
-                PictureBox_DrawRect(i, imglib.valueList[i].Item1, imglib.valueList[i].Item2, imglib.valueList[i].Item3, imglib.valueList[i].Item4, imglib.valueList[i].Item5);
+                PictureBox_DrawRect(i, 
+                    imglib.valueList[i].Item1, 
+                    imglib.valueList[i].Item2, 
+                    imglib.valueList[i].Item3, 
+                    imglib.valueList[i].Item4, 
+                    imglib.valueList[i].Item5,
+                    imglib.colorDict[imglib.valueList[i].Item1]);
             }
         }
 
@@ -184,18 +192,19 @@ namespace ImageLabel
         /// <param name="y0"></param>
         /// <param name="x1"></param>
         /// <param name="y1"></param>
-        private void PictureBox_DrawRect(int no, string label, int x0, int y0, int x1, int y1)
+        private void PictureBox_DrawRect(int no, string label, int x0, int y0, int x1, int y1, Color color)
         {
             Image img = PictureBox.Image;
             Graphics g = Graphics.FromImage(img);
-            Pen pen = new Pen(Color.Yellow);
+            Pen pen = new Pen(color);
             g.DrawRectangle(pen, new Rectangle(x0, y0, x1 - x0, y1 - y0));
 
             // Create string to draw.
-            String drawString = no.ToString() + label;
+            string drawString = no.ToString();
+            //string drawString = no.ToString() + label;
 
             // Create font and brush.
-            Font drawFont = new Font("Arial", 16);
+            Font drawFont = new Font("Arial", 14);
             SolidBrush drawBrush = new SolidBrush(Color.Red);
 
             // Create point for upper-left corner of drawing.
@@ -222,19 +231,19 @@ namespace ImageLabel
             };
             dataGridView1.Columns.Insert(0, col1);
 
-            DataGridViewComboBoxColumn colShow = new DataGridViewComboBoxColumn
+            DataGridViewComboBoxColumn col2 = new DataGridViewComboBoxColumn
             {
                 Name = "label",
                 HeaderText = "标签",
                 Width = 100
             };
-            for (int j = 0; j < imglib.classList.Count; j++)
+            foreach (string label in imglib.classList)
             {
-                colShow.Items.Add(imglib.classList[j]);
+                col2.Items.Add(label);
             }
 
-            colShow.DisplayIndex = 1;
-            dataGridView1.Columns.Insert(1, colShow);
+            col2.DisplayIndex = 1;
+            dataGridView1.Columns.Insert(1, col2);
             //dataGridView1.Rows[1].Cells[1].Value = imglib.classList[2];
             dataGridView1.CellValueChanged -= dataGridView1_CellValueChanged;//line added after solution given
             dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;//line added after solution given
@@ -247,7 +256,8 @@ namespace ImageLabel
             dataGridView1.Rows.Clear();
             for (int i = 0; i < rowsNum; i++)
             {
-                dataGridView1.Rows.Add(i, imglib.valueList[i].Item1);
+                string label = imglib.valueList[i].Item1;
+                dataGridView1.Rows.Add(i, imglib.classList.Contains(label) ? label : imglib.classList[0]);
             }
         }
 
@@ -263,9 +273,11 @@ namespace ImageLabel
             if (dataGridView1.Columns[columnIndex].Name == "label" && !imglib.valueList[rowIndex].Item1.Equals(newValue))
             {
                 imglib.valueList[rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
-                imglib.dic[imglib.imgNameList[index]][rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
+                imglib.dict[imglib.imgNameList[index]][rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
             }
+            pictureBox_Draw(index);
         }
         #endregion
+
     }
 }

@@ -45,6 +45,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.ButtonPrePic = new System.Windows.Forms.Button();
             this.ButtonNextPic = new System.Windows.Forms.Button();
+            this.ButtonInitAnno = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -67,6 +68,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.ButtonInitAnno);
             this.groupBox1.Controls.Add(this.ButtonJumpIndex);
             this.groupBox1.Controls.Add(this.BoxJumpIndex);
             this.groupBox1.Controls.Add(this.label3);
@@ -243,6 +245,17 @@
             this.ButtonNextPic.UseVisualStyleBackColor = true;
             this.ButtonNextPic.Click += new System.EventHandler(this.ButtonNextPic_Click);
             // 
+            // ButtonInitAnno
+            // 
+            this.ButtonInitAnno.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonInitAnno.Location = new System.Drawing.Point(756, 20);
+            this.ButtonInitAnno.Name = "ButtonInitAnno";
+            this.ButtonInitAnno.Size = new System.Drawing.Size(123, 23);
+            this.ButtonInitAnno.TabIndex = 14;
+            this.ButtonInitAnno.Text = "初始化标注文件(慎)";
+            this.ButtonInitAnno.UseVisualStyleBackColor = true;
+            this.ButtonInitAnno.Click += new System.EventHandler(this.ButtonInitAnno_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -252,7 +265,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.PictureBox);
             this.Name = "Form1";
-            this.Text = "ImageLabel";
+            this.Text = "ImageLabel  by: Fu J. & Zhao Z.";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).EndInit();
             this.groupBox1.ResumeLayout(false);
@@ -282,6 +295,7 @@
         private System.Windows.Forms.TextBox BoxJumpIndex;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button ButtonInitAnno;
     }
 }
 
