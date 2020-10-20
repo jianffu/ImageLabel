@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Reflection;
+
 namespace ImageLabel
 {
     public partial class Form1 : Form
     {
-        int index = 0;
+        int index = 0;  // 当前图片 index
         ImageLib imglib = new ImageLib();
 
         public Form1()
         {
             InitializeComponent();
 
-            imglib.getClassList();
             InitDataGridView();
         }
 
@@ -30,15 +26,15 @@ namespace ImageLabel
             if (FBDialog.ShowDialog() == DialogResult.OK)//判断是否选择了文件夹
             {
                 string path= FBDialog.SelectedPath;//记录选择的文件夹
-                imglib.imageFromDirector(path);
+                imglib.ImageFromDirector(path);
                 BoxPicDir.Text = imglib.directorPath;//用textBox记录获取的路径
                 BoxJumpIndex.Text = "0";
                 PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[0]);
             }
             if (imglib.isChanged == 1)
             {
-                imglib.savelabel();
-                pictureBox_Draw(index);
+                imglib.SaveLabel();
+                PictureBox_Draw(index);
             }
         }
         
@@ -62,32 +58,20 @@ namespace ImageLabel
                     using (StreamReader reader = new StreamReader(fileStream))
                     {
                         string line;
-                        string[] strArr;
-                        string defalutLabel = "未打电话";
-                        string lastFileName = "";
-                        List<Tuple<string, int, int, int, int>> tupleList = new List<Tuple<string, int, int, int, int>>();
+
                         // 从文件读取并显示行，直到文件的末尾 
                         while ((line = reader.ReadLine()) != null)
                         {
-                            strArr = line.Split(' ');
-                            if (!lastFileName.Equals("") && !strArr[0].Equals(lastFileName))
-                            {
-                                imglib.addLabel(lastFileName, tupleList);
-                                tupleList = new List<Tuple<string, int, int, int, int>>();
-                            }
-                            tupleList.Add(Tuple.Create(defalutLabel, int.Parse(strArr[2]), int.Parse(strArr[3]), int.Parse(strArr[4]), int.Parse(strArr[5])));
-                            lastFileName = strArr[0];
-
+                            imglib.AddLabel(line);
                         }
-                        imglib.addLabel(lastFileName, tupleList);
-                        tupleList = new List<Tuple<string, int, int, int, int>>();
                     }
                     imglib.isChanged = 1;
                     if (imglib.imgCount != 0)
                     {
-                        imglib.savelabel();
-                        pictureBox_Draw(index);
-                        startDataGridView();
+                        imglib.SaveLabel();
+                        BoxJumpIndex.Text = 0.ToString();
+                        ButtonJumpIndex_Click(sender, e);
+                        StartDataGridView();
                     }
                 }
             }
@@ -128,18 +112,14 @@ namespace ImageLabel
 
         private void ButtonJumpIndex_Click(object sender, EventArgs e)
         {
-            imglib.savelabel();
+            imglib.SaveLabel();
             try
             {
                 int jump = int.Parse(BoxJumpIndex.Text);
                 if (jump >= 0 && jump < imglib.imgCount)
                 {
-                    PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[jump]);
-                    
-                    LabelFilename.Text = "./" + imglib.imgNameList[jump];
                     index = jump;
-                    pictureBox_Draw(index);
-                    startDataGridView();
+                    ReloadPicture();
                 }
                 else
                 {
@@ -154,24 +134,47 @@ namespace ImageLabel
 
         private void ButtonSaveAnno_Click(object sender, EventArgs e)
         {
-            imglib.savelabel();
+            imglib.SaveLabel();
+        }
+
+        private void ButtonInitAnno_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("此举将使所有标签重置！确认吗？", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                imglib.InitializeLabels();
+            }
+        }
+
+        private void HideBoxBox_CheckedChanged(object sender, EventArgs e)
+        {
+            ReloadPicture();
         }
         #endregion
 
         #region Picture Draw
+        private void ReloadPicture()
+        {
+            if (index >= imglib.imgCount || index < 0)
+                return;
+            PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[index]);
+            LabelFilename.Text = "./" + imglib.imgNameList[index];
+            if (!HideBoxBox.Checked)
+                PictureBox_Draw(index);
+            StartDataGridView();
+        }
+
         /// <summary>
         /// 更新 PictureBox 的图片.
         /// </summary>
         /// <param name="picIndex">图片编号</param>
-        private void pictureBox_Draw(int picIndex)
+        private void PictureBox_Draw(int picIndex)
         {
-            //List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
-            imglib.dic.TryGetValue(imglib.imgNameList[picIndex], out imglib.valueList);
-            if (imglib.valueList is null)
+            if (!imglib.boxDict.TryGetValue(imglib.imgNameList[picIndex], out var boxList))
                 return;
-            for (int i=0;i< imglib.valueList.Count;i++)
+            for (int i=0; i < boxList.Count; i++)
             {
-                PictureBox_DrawRect(i, imglib.valueList[i].Item1, imglib.valueList[i].Item2, imglib.valueList[i].Item3, imglib.valueList[i].Item4, imglib.valueList[i].Item5);
+                Box box = boxList[i];
+                PictureBox_DrawRect(i, box.label, box.p1.X, box.p1.Y, box.p2.X, box.p2.Y, imglib.colorDict[box.label]);
             }
         }
 
@@ -184,18 +187,19 @@ namespace ImageLabel
         /// <param name="y0"></param>
         /// <param name="x1"></param>
         /// <param name="y1"></param>
-        private void PictureBox_DrawRect(int no, string label, int x0, int y0, int x1, int y1)
+        private void PictureBox_DrawRect(int no, string label, int x0, int y0, int x1, int y1, Color color)
         {
             Image img = PictureBox.Image;
             Graphics g = Graphics.FromImage(img);
-            Pen pen = new Pen(Color.Yellow);
+            Pen pen = new Pen(color);
             g.DrawRectangle(pen, new Rectangle(x0, y0, x1 - x0, y1 - y0));
 
             // Create string to draw.
-            String drawString = no.ToString() + label;
+            string drawString = no.ToString();
+            //string drawString = no.ToString() + label;
 
             // Create font and brush.
-            Font drawFont = new Font("Arial", 16);
+            Font drawFont = new Font("Arial", 14);
             SolidBrush drawBrush = new SolidBrush(Color.Red);
 
             // Create point for upper-left corner of drawing.
@@ -206,65 +210,111 @@ namespace ImageLabel
             g.Dispose();
             PictureBox.Image = img;
         }
+
+        /// <summary>
+        /// 捕获点击位置并更改所在位置的框之类
+        /// ref: https://blog.csdn.net/lysc_forever/article/details/39530451
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PictureBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (PictureBox.Image is null) return;
+            if (HideBoxBox.Checked) return;
+
+            //int originalWidth = this.PictureBox.Image.Width;
+            int originalHeight = this.PictureBox.Image.Height;
+
+            PropertyInfo rectangleProperty = this.PictureBox.GetType().GetProperty("ImageRectangle", BindingFlags.Instance | BindingFlags.NonPublic);
+            Rectangle rectangle = (Rectangle)rectangleProperty.GetValue(this.PictureBox, null);
+
+            int currentWidth = rectangle.Width;
+            int currentHeight = rectangle.Height;
+
+            double rate = (double)currentHeight / (double)originalHeight;
+
+            int black_left_width = (currentWidth == this.PictureBox.Width) ? 0 : (this.PictureBox.Width - currentWidth) / 2;
+            int black_top_height = (currentHeight == this.PictureBox.Height) ? 0 : (this.PictureBox.Height - currentHeight) / 2;
+
+            int zoom_x = e.X - black_left_width;
+            int zoom_y = e.Y - black_top_height;
+
+            double original_x = (double)zoom_x / rate;
+            double original_y = (double)zoom_y / rate;
+
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat("原始尺寸{0}/{1}(宽/高)\r\n", originalWidth, originalHeight);
+            //sb.AppendFormat("缩放状态图片尺寸{0}/{1}(宽/高)\r\n", currentWidth, currentHeight);
+            //sb.AppendFormat("缩放比率{0}\r\n", rate);
+            //sb.AppendFormat("左留白宽度{0}\r\n", black_left_width);
+            //sb.AppendFormat("上留白高度{0}\r\n", black_top_height);
+            //sb.AppendFormat("当前鼠标坐标{0}/{1}(X/Y)\r\n", e.X, e.Y);
+            //sb.AppendFormat("缩放图中鼠标坐标{0}/{1}(X/Y)\r\n", zoom_x, zoom_y);
+            //sb.AppendFormat("原始图中鼠标坐标{0}/{1}(X/Y)\r\n", original_x, original_y);
+            //Console.WriteLine(sb.ToString());
+
+            imglib.RotateBoxLabelByClickPoint(imglib.GetBoxListByIndex(index), new Point((int)original_x, (int)original_y));
+            ButtonJumpIndex_Click(sender, e);
+        }
         #endregion
 
         #region DataGrid Event
         private void InitDataGridView()
         {
-            
-            dataGridView1.AllowUserToAddRows = false;
+            DataGridView.AllowUserToAddRows = false;
             DataGridViewTextBoxColumn col1 = new DataGridViewTextBoxColumn
             {
                 Name = "No",
-                HeaderText = "序号",
+                HeaderText = "ID",
                 Width = 45,
                 ReadOnly = true
             };
-            dataGridView1.Columns.Insert(0, col1);
+            DataGridView.Columns.Insert(0, col1);
 
-            DataGridViewComboBoxColumn colShow = new DataGridViewComboBoxColumn
+            DataGridViewComboBoxColumn col2 = new DataGridViewComboBoxColumn
             {
                 Name = "label",
                 HeaderText = "标签",
                 Width = 100
             };
-            for (int j = 0; j < imglib.classList.Count; j++)
+            foreach (string label in imglib.classList)
             {
-                colShow.Items.Add(imglib.classList[j]);
+                col2.Items.Add(label);
             }
 
-            colShow.DisplayIndex = 1;
-            dataGridView1.Columns.Insert(1, colShow);
+            col2.DisplayIndex = 1;
+            DataGridView.Columns.Insert(1, col2);
             //dataGridView1.Rows[1].Cells[1].Value = imglib.classList[2];
-            dataGridView1.CellValueChanged -= dataGridView1_CellValueChanged;//line added after solution given
-            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;//line added after solution given
+            DataGridView.CellValueChanged -= DataGridView_CellValueChanged;//line added after solution given
+            DataGridView.CellValueChanged += DataGridView_CellValueChanged;//line added after solution given
         }
-        private void startDataGridView()
+
+        private void StartDataGridView()
         {
-            if (imglib.valueList is null)
-                return;
-            int rowsNum = imglib.valueList.Count;
-            dataGridView1.Rows.Clear();
-            for (int i = 0; i < rowsNum; i++)
+            var boxList = imglib.GetBoxListByIndex(index);
+            DataGridView.Rows.Clear();
+            for (int i = 0; i < boxList.Count; i++)
             {
-                dataGridView1.Rows.Add(i, imglib.valueList[i].Item1);
+                string label = boxList[i].label;
+                DataGridView.Rows.Add(i, imglib.classList.Contains(label) ? label : imglib.classList[0]);
             }
         }
 
         /// <summary>
         /// datagridview内嵌控件值修改事件
         /// </summary>
-        private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             int columnIndex = e.ColumnIndex;
             int rowIndex = e.RowIndex;
-            string newValue = dataGridView1.Rows[rowIndex].Cells[columnIndex].Value.ToString();
+            var currentBox = imglib.GetBoxListByIndex(index)[rowIndex];
+            string newValue = DataGridView.Rows[rowIndex].Cells[columnIndex].Value.ToString();
             
-            if (dataGridView1.Columns[columnIndex].Name == "label" && !imglib.valueList[rowIndex].Item1.Equals(newValue))
+            if (DataGridView.Columns[columnIndex].Name == "label" && !currentBox.label.Equals(newValue))
             {
-                imglib.valueList[rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
-                imglib.dic[imglib.imgNameList[index]][rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
+                imglib.boxDict[imglib.imgNameList[index]][rowIndex].label = newValue;
             }
+            PictureBox_Draw(index);
         }
         #endregion
     }
