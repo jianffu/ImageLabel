@@ -213,16 +213,21 @@ namespace ImageLabel
         {
             
             dataGridView1.AllowUserToAddRows = false;
-            DataGridViewTextBoxColumn col1 = new DataGridViewTextBoxColumn();
-            col1.Name = "No";
-            col1.HeaderText = "序号";
-            col1.Width = 60;
+            DataGridViewTextBoxColumn col1 = new DataGridViewTextBoxColumn
+            {
+                Name = "No",
+                HeaderText = "序号",
+                Width = 45,
+                ReadOnly = true
+            };
             dataGridView1.Columns.Insert(0, col1);
 
-            DataGridViewComboBoxColumn colShow = new DataGridViewComboBoxColumn();
-            colShow.Name = "label";
-            colShow.HeaderText = "标签";
-            colShow.Width = 100;
+            DataGridViewComboBoxColumn colShow = new DataGridViewComboBoxColumn
+            {
+                Name = "label",
+                HeaderText = "标签",
+                Width = 100
+            };
             for (int j = 0; j < imglib.classList.Count; j++)
             {
                 colShow.Items.Add(imglib.classList[j]);

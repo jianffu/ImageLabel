@@ -52,6 +52,10 @@ namespace ImageLabel
 
         public void savelabel()
         {
+            if (labelFilePath is null)
+            {
+                return;
+            }
             int no = labelFilePath.LastIndexOf('\\');
             
             destLabelFilePath = labelFilePath.Substring(0, no + 1) + "labelFile.txt";

@@ -211,11 +211,14 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 101);
+            this.dataGridView1.Location = new System.Drawing.Point(6, 78);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(200, 394);
+            this.dataGridView1.Size = new System.Drawing.Size(188, 411);
             this.dataGridView1.TabIndex = 7;
             // 
             // ButtonPrePic
@@ -225,7 +228,7 @@
             this.ButtonPrePic.Name = "ButtonPrePic";
             this.ButtonPrePic.Size = new System.Drawing.Size(75, 23);
             this.ButtonPrePic.TabIndex = 6;
-            this.ButtonPrePic.Text = "上一张";
+            this.ButtonPrePic.Text = "上一张(&P)";
             this.ButtonPrePic.UseVisualStyleBackColor = true;
             this.ButtonPrePic.Click += new System.EventHandler(this.ButtonPrePic_Click);
             // 
@@ -236,7 +239,7 @@
             this.ButtonNextPic.Name = "ButtonNextPic";
             this.ButtonNextPic.Size = new System.Drawing.Size(75, 23);
             this.ButtonNextPic.TabIndex = 5;
-            this.ButtonNextPic.Text = "下一张";
+            this.ButtonNextPic.Text = "下一张(&S)";
             this.ButtonNextPic.UseVisualStyleBackColor = true;
             this.ButtonNextPic.Click += new System.EventHandler(this.ButtonNextPic_Click);
             // 
