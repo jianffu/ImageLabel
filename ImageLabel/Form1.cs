@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Reflection;
+
 namespace ImageLabel
 {
     public partial class Form1 : Form
     {
-        int index = 0;
+        int index = 0;  // 当前图片 index
         ImageLib imglib = new ImageLib();
 
         public Form1()
@@ -37,7 +34,7 @@ namespace ImageLabel
             if (imglib.isChanged == 1)
             {
                 imglib.SaveLabel();
-                pictureBox_Draw(index);
+                PictureBox_Draw(index);
             }
         }
         
@@ -61,30 +58,20 @@ namespace ImageLabel
                     using (StreamReader reader = new StreamReader(fileStream))
                     {
                         string line;
-                        string[] strArr;
-                        string lastFileName = "";
-                        List<Tuple<string, int, int, int, int>> tupleList = new List<Tuple<string, int, int, int, int>>();
+
                         // 从文件读取并显示行，直到文件的末尾 
                         while ((line = reader.ReadLine()) != null)
                         {
-                            strArr = line.Split(' ');
-                            if (!lastFileName.Equals("") && !strArr[0].Equals(lastFileName))
-                            {
-                                imglib.AddLabel(lastFileName, tupleList);
-                                tupleList = new List<Tuple<string, int, int, int, int>>();
-                            }
-                            tupleList.Add(Tuple.Create(strArr[1], int.Parse(strArr[2]), int.Parse(strArr[3]), int.Parse(strArr[4]), int.Parse(strArr[5])));
-                            lastFileName = strArr[0];
+                            imglib.AddLabel(line);
                         }
-                        imglib.AddLabel(lastFileName, tupleList);
-                        tupleList = new List<Tuple<string, int, int, int, int>>();
                     }
                     imglib.isChanged = 1;
                     if (imglib.imgCount != 0)
                     {
                         imglib.SaveLabel();
-                        pictureBox_Draw(index);
-                        startDataGridView();
+                        BoxJumpIndex.Text = 0.ToString();
+                        ButtonJumpIndex_Click(sender, e);
+                        StartDataGridView();
                     }
                 }
             }
@@ -135,8 +122,8 @@ namespace ImageLabel
                     
                     LabelFilename.Text = "./" + imglib.imgNameList[jump];
                     index = jump;
-                    pictureBox_Draw(index);
-                    startDataGridView();
+                    PictureBox_Draw(index);
+                    StartDataGridView();
                 }
                 else
                 {
@@ -156,7 +143,10 @@ namespace ImageLabel
 
         private void ButtonInitAnno_Click(object sender, EventArgs e)
         {
-            imglib.InitializeLabels();
+            if (MessageBox.Show("此举将使所有标签重置！确认吗？", "确认框", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                imglib.InitializeLabels();
+            }
         }
         #endregion
 
@@ -165,21 +155,14 @@ namespace ImageLabel
         /// 更新 PictureBox 的图片.
         /// </summary>
         /// <param name="picIndex">图片编号</param>
-        private void pictureBox_Draw(int picIndex)
+        private void PictureBox_Draw(int picIndex)
         {
-            //List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
-            imglib.dict.TryGetValue(imglib.imgNameList[picIndex], out imglib.valueList);
-            if (imglib.valueList is null)
+            if (!imglib.boxDict.TryGetValue(imglib.imgNameList[picIndex], out var boxList))
                 return;
-            for (int i=0; i < imglib.valueList.Count; i++)
+            for (int i=0; i < boxList.Count; i++)
             {
-                PictureBox_DrawRect(i, 
-                    imglib.valueList[i].Item1, 
-                    imglib.valueList[i].Item2, 
-                    imglib.valueList[i].Item3, 
-                    imglib.valueList[i].Item4, 
-                    imglib.valueList[i].Item5,
-                    imglib.colorDict[imglib.valueList[i].Item1]);
+                Box box = boxList[i];
+                PictureBox_DrawRect(i, box.label, box.p1.X, box.p1.Y, box.p2.X, box.p2.Y, imglib.colorDict[box.label]);
             }
         }
 
@@ -215,13 +198,54 @@ namespace ImageLabel
             g.Dispose();
             PictureBox.Image = img;
         }
+
+        /// <summary>
+        /// 捕获点击位置并更改所在位置的框之类
+        /// ref: https://blog.csdn.net/lysc_forever/article/details/39530451
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PictureBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (PictureBox.Image is null) return;
+            int originalWidth = this.PictureBox.Image.Width;
+            int originalHeight = this.PictureBox.Image.Height;
+
+            PropertyInfo rectangleProperty = this.PictureBox.GetType().GetProperty("ImageRectangle", BindingFlags.Instance | BindingFlags.NonPublic);
+            Rectangle rectangle = (Rectangle)rectangleProperty.GetValue(this.PictureBox, null);
+
+            int currentWidth = rectangle.Width;
+            int currentHeight = rectangle.Height;
+
+            double rate = (double)currentHeight / (double)originalHeight;
+
+            int black_left_width = (currentWidth == this.PictureBox.Width) ? 0 : (this.PictureBox.Width - currentWidth) / 2;
+            int black_top_height = (currentHeight == this.PictureBox.Height) ? 0 : (this.PictureBox.Height - currentHeight) / 2;
+
+            int zoom_x = e.X - black_left_width;
+            int zoom_y = e.Y - black_top_height;
+
+            double original_x = (double)zoom_x / rate;
+            double original_y = (double)zoom_y / rate;
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("原始尺寸{0}/{1}(宽/高)\r\n", originalWidth, originalHeight);
+            sb.AppendFormat("缩放状态图片尺寸{0}/{1}(宽/高)\r\n", currentWidth, currentHeight);
+            sb.AppendFormat("缩放比率{0}\r\n", rate);
+            sb.AppendFormat("左留白宽度{0}\r\n", black_left_width);
+            sb.AppendFormat("上留白高度{0}\r\n", black_top_height);
+            sb.AppendFormat("当前鼠标坐标{0}/{1}(X/Y)\r\n", e.X, e.Y);
+            sb.AppendFormat("缩放图中鼠标坐标{0}/{1}(X/Y)\r\n", zoom_x, zoom_y);
+            sb.AppendFormat("原始图中鼠标坐标{0}/{1}(X/Y)\r\n", original_x, original_y);
+            Console.WriteLine(sb.ToString());
+        }
         #endregion
 
         #region DataGrid Event
         private void InitDataGridView()
         {
-            
-            dataGridView1.AllowUserToAddRows = false;
+            DataGridView.AllowUserToAddRows = false;
             DataGridViewTextBoxColumn col1 = new DataGridViewTextBoxColumn
             {
                 Name = "No",
@@ -229,7 +253,7 @@ namespace ImageLabel
                 Width = 45,
                 ReadOnly = true
             };
-            dataGridView1.Columns.Insert(0, col1);
+            DataGridView.Columns.Insert(0, col1);
 
             DataGridViewComboBoxColumn col2 = new DataGridViewComboBoxColumn
             {
@@ -243,41 +267,38 @@ namespace ImageLabel
             }
 
             col2.DisplayIndex = 1;
-            dataGridView1.Columns.Insert(1, col2);
+            DataGridView.Columns.Insert(1, col2);
             //dataGridView1.Rows[1].Cells[1].Value = imglib.classList[2];
-            dataGridView1.CellValueChanged -= dataGridView1_CellValueChanged;//line added after solution given
-            dataGridView1.CellValueChanged += dataGridView1_CellValueChanged;//line added after solution given
+            DataGridView.CellValueChanged -= DataGridView_CellValueChanged;//line added after solution given
+            DataGridView.CellValueChanged += DataGridView_CellValueChanged;//line added after solution given
         }
-        private void startDataGridView()
+        private void StartDataGridView()
         {
-            if (imglib.valueList is null)
-                return;
-            int rowsNum = imglib.valueList.Count;
-            dataGridView1.Rows.Clear();
-            for (int i = 0; i < rowsNum; i++)
+            var boxList = imglib.GetBoxListByIndex(index);
+            DataGridView.Rows.Clear();
+            for (int i = 0; i < boxList.Count; i++)
             {
-                string label = imglib.valueList[i].Item1;
-                dataGridView1.Rows.Add(i, imglib.classList.Contains(label) ? label : imglib.classList[0]);
+                string label = boxList[i].label;
+                DataGridView.Rows.Add(i, imglib.classList.Contains(label) ? label : imglib.classList[0]);
             }
         }
 
         /// <summary>
         /// datagridview内嵌控件值修改事件
         /// </summary>
-        private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             int columnIndex = e.ColumnIndex;
             int rowIndex = e.RowIndex;
-            string newValue = dataGridView1.Rows[rowIndex].Cells[columnIndex].Value.ToString();
+            var currentBox = imglib.GetBoxListByIndex(index)[rowIndex];
+            string newValue = DataGridView.Rows[rowIndex].Cells[columnIndex].Value.ToString();
             
-            if (dataGridView1.Columns[columnIndex].Name == "label" && !imglib.valueList[rowIndex].Item1.Equals(newValue))
+            if (DataGridView.Columns[columnIndex].Name == "label" && !currentBox.label.Equals(newValue))
             {
-                imglib.valueList[rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
-                imglib.dict[imglib.imgNameList[index]][rowIndex] = Tuple.Create(newValue, imglib.valueList[rowIndex].Item2, imglib.valueList[rowIndex].Item3, imglib.valueList[rowIndex].Item4, imglib.valueList[rowIndex].Item5);
+                imglib.boxDict[imglib.imgNameList[index]][rowIndex].label = newValue;
             }
-            pictureBox_Draw(index);
+            PictureBox_Draw(index);
         }
         #endregion
-
     }
 }

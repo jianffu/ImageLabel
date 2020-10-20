@@ -1,14 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
 
 namespace ImageLabel
 {
+    class Box
+    {
+        public string img;
+        public string label;
+        public Point p1, p2;
+
+        public Box(string img, string label, Rectangle rect)
+        {
+            this.img = img;
+            this.label = label;
+            p1 = new Point(rect.X, rect.Y);
+            p2 = new Point(rect.X + rect.Width, rect.Y + rect.Height);
+        }
+
+        public Box(string img, string label, Point upleft, Point bottomright)
+        {
+            this.img = img;
+            this.label = label;
+            p1 = upleft;
+            p2 = bottomright;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(" ", new object[] { img, label, p1.X, p1.Y, p2.X, p2.Y });
+        }
+    }
+
     class ImageLib
     {
         public int imgCount = 0;
@@ -20,8 +45,7 @@ namespace ImageLabel
         public List<string> imgNameList = new List<string>();
         public List<string> classList = new List<string>();
         public Dictionary<string, Color> colorDict = new Dictionary<string, Color>();
-        public List<Tuple<string, int, int, int, int>> valueList = new List<Tuple<string, int, int, int, int>>();
-        public Dictionary<string, List<Tuple<string, int, int, int, int>>> dict = new Dictionary<string, List<Tuple<string, int, int, int, int>>>();
+        public Dictionary<string, List<Box>> boxDict = new Dictionary<string, List<Box>>();
 
         public ImageLib()
         {
@@ -47,56 +71,69 @@ namespace ImageLabel
                     if (f.Name.EndsWith(suffix))
                     {
                         imgNameList.Add(f.Name);//添加文件名到列表中
+                        boxDict.Add(f.Name, new List<Box>());
                         break;
                     }
             }
             imgCount = imgNameList.Count;
         }
 
-        public void AddLabel(string key, List<Tuple<string, int, int, int, int>> value)
+        public void AddLabel(string key, string label, Point p1, Point p2)
         {
-            dict.Add(key, value);
+            if (!boxDict.ContainsKey(key))
+                boxDict.Add(key, new List<Box>());
+
+            boxDict[key].Add(new Box(key, label, p1, p2));
+        }
+
+        public void AddLabel(string line)
+        {
+            string[] arr = line.Split(' ');
+            string key = arr[0];
+            string label = classList.Contains(arr[1]) ? arr[1] : classList[0];
+            Point p1 = new Point(int.Parse(arr[2]), int.Parse(arr[3]));
+            Point p2 = new Point(int.Parse(arr[4]), int.Parse(arr[5]));
+
+            AddLabel(key, label, p1, p2);
         }
 
         public void SaveLabel()
         {
             if (labelFilePath is null) return;
 
-            //int no = labelFilePath.LastIndexOf('\\');
-            //destLabelFilePath = labelFilePath.Substring(0, no + 1) + "labelFile.txt";
             destLabelFilePath = labelFilePath;
-
-            string strLine;
-            _ = new List<Tuple<string, int, int, int, int>>();
-            int i;int j;int length; string strPath;
             using (StreamWriter sw = new StreamWriter(destLabelFilePath))
             {
-                for ( i = 0; i < imgCount; i++)
+                foreach (string imgName in imgNameList)
                 {
-                    strPath = imgNameList[i];
-                    dict.TryGetValue(strPath, out List<Tuple<string, int, int, int, int>> valueList);
-                    if (valueList is null)
-                        continue;
-
-                    length = valueList.Count;
-                    for (j = 0; j < length; j++)
+                    if (!boxDict.ContainsKey(imgName)) continue;
+                    boxDict.TryGetValue(imgName, out List<Box> boxList);
+                    foreach (Box box in boxList)
                     {
-                        strLine = strPath + ' ' + valueList[j].Item1 + ' ' + valueList[j].Item2 + ' ' + valueList[j].Item3 + ' ' + valueList[j].Item4 + ' ' + valueList[j].Item5;
-                        sw.WriteLine(strLine);
+                        sw.WriteLine(box.ToString());
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 通过图片标号获取其 boxes
+        /// </summary>
+        /// <param name="index">图片标号</param>
+        /// <returns></returns>
+        public List<Box> GetBoxListByIndex(int index)
+        {
+            boxDict.TryGetValue(imgNameList[index], out var boxList);
+            return !(boxList is null) ? boxList : new List<Box>();
+        }
+
         public void InitializeLabels()
         {
-            foreach (var picBoxList in dict.Values)
+            foreach (var picBoxList in boxDict.Values)
             {
-                if (picBoxList is null) continue;
-                for (int i=0; i<picBoxList.Count; i++)
+                foreach (var box in picBoxList)
                 {
-                    var box = picBoxList[i];
-                    picBoxList[i] = Tuple.Create(classList[0], box.Item2, box.Item3, box.Item4, box.Item5);
+                    box.label = classList[0];
                 }
             }
         }

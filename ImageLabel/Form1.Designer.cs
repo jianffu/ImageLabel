@@ -42,14 +42,14 @@
             this.BoxPicDir = new System.Windows.Forms.TextBox();
             this.ButtonBrowserPicDir = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.ButtonPrePic = new System.Windows.Forms.Button();
             this.ButtonNextPic = new System.Windows.Forms.Button();
             this.ButtonInitAnno = new System.Windows.Forms.Button();
+            this.DataGridView = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.DataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // PictureBox
@@ -63,6 +63,7 @@
             this.PictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.PictureBox.TabIndex = 0;
             this.PictureBox.TabStop = false;
+            this.PictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PictureBox_MouseClick);
             // 
             // groupBox1
             // 
@@ -201,7 +202,7 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.dataGridView1);
+            this.groupBox2.Controls.Add(this.DataGridView);
             this.groupBox2.Controls.Add(this.ButtonPrePic);
             this.groupBox2.Controls.Add(this.ButtonNextPic);
             this.groupBox2.Location = new System.Drawing.Point(796, 124);
@@ -210,18 +211,6 @@
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "标注区";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(6, 78);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(188, 411);
-            this.dataGridView1.TabIndex = 7;
             // 
             // ButtonPrePic
             // 
@@ -256,6 +245,19 @@
             this.ButtonInitAnno.UseVisualStyleBackColor = true;
             this.ButtonInitAnno.Click += new System.EventHandler(this.ButtonInitAnno_Click);
             // 
+            // DataGridView
+            // 
+            this.DataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DataGridView.Location = new System.Drawing.Point(6, 78);
+            this.DataGridView.Name = "DataGridView";
+            this.DataGridView.RowTemplate.Height = 23;
+            this.DataGridView.Size = new System.Drawing.Size(188, 411);
+            this.DataGridView.TabIndex = 7;
+            this.DataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellValueChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -271,7 +273,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.DataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -294,8 +296,8 @@
         private System.Windows.Forms.Button ButtonJumpIndex;
         private System.Windows.Forms.TextBox BoxJumpIndex;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button ButtonInitAnno;
+        private System.Windows.Forms.DataGridView DataGridView;
     }
 }
 
