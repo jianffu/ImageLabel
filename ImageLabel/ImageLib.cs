@@ -10,9 +10,16 @@ namespace ImageLabel
 {
     class ImageLib
     {
-        public string directorPath;
-        public List<string> imgNameList = new List<string>();
         public int imgCount = 0;
+        public int isChanged = 0;
+        public string classListPath = "ClassList.txt";
+        public string destLabelFilePath;
+        public string directorPath;
+        public string labelFilePath;
+        public List<string> imgNameList = new List<string>();
+        public List<string> classList = new List<string>();
+        public List<Tuple<string, int, int, int, int>> valueList = new List<Tuple<string, int, int, int, int>>();
+        public Dictionary<string, List<Tuple<string, int, int, int, int>>> dic = new Dictionary<string, List<Tuple<string, int, int, int, int>>>();
 
         public void imageFromDirector(string dir)
         {
@@ -38,23 +45,22 @@ namespace ImageLabel
             imgCount = imgNameList.Count;
         }
 
-        public string destLabelFilePath;
-        public string labelFilePath;
-        public int isChanged = 0;
-        public Dictionary<string, List<Tuple<String, int, int, int, int>>> dic = new Dictionary<string, List<Tuple<String, int, int, int, int>>>();
-        public List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
-        public void addLabel(string key, List<Tuple<String, int, int, int, int>> value)
+        public void addLabel(string key, List<Tuple<string, int, int, int, int>> value)
         {
             dic.Add(key, value);
         }
 
         public void savelabel()
         {
+            if (labelFilePath is null)
+            {
+                return;
+            }
             int no = labelFilePath.LastIndexOf('\\');
             
             destLabelFilePath = labelFilePath.Substring(0, no + 1) + "labelFile.txt";
             string strLine;
-            List<Tuple<String, int, int, int, int>> valueList = new List<Tuple<String, int, int, int, int>>();
+            List<Tuple<string, int, int, int, int>> valueList = new List<Tuple<string, int, int, int, int>>();
             int i;int j;int length; string strPath;
             using (StreamWriter sw = new StreamWriter(destLabelFilePath))
             {
@@ -75,8 +81,6 @@ namespace ImageLabel
             }
         }
 
-        string classListPath = "ClassList.txt";
-        public List<string> classList = new List<string>();
         public void getClassList()
         {
             try
