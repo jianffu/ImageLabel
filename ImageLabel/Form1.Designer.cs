@@ -46,6 +46,7 @@
             this.ButtonNextPic = new System.Windows.Forms.Button();
             this.ButtonInitAnno = new System.Windows.Forms.Button();
             this.DataGridView = new System.Windows.Forms.DataGridView();
+            this.HideBoxBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -202,6 +203,7 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.HideBoxBox);
             this.groupBox2.Controls.Add(this.DataGridView);
             this.groupBox2.Controls.Add(this.ButtonPrePic);
             this.groupBox2.Controls.Add(this.ButtonNextPic);
@@ -219,7 +221,7 @@
             this.ButtonPrePic.Name = "ButtonPrePic";
             this.ButtonPrePic.Size = new System.Drawing.Size(75, 23);
             this.ButtonPrePic.TabIndex = 6;
-            this.ButtonPrePic.Text = "上一张(&P)";
+            this.ButtonPrePic.Text = "上一张(&D)";
             this.ButtonPrePic.UseVisualStyleBackColor = true;
             this.ButtonPrePic.Click += new System.EventHandler(this.ButtonPrePic_Click);
             // 
@@ -258,6 +260,17 @@
             this.DataGridView.TabIndex = 7;
             this.DataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView_CellValueChanged);
             // 
+            // HideBoxBox
+            // 
+            this.HideBoxBox.AutoSize = true;
+            this.HideBoxBox.Location = new System.Drawing.Point(7, 21);
+            this.HideBoxBox.Name = "HideBoxBox";
+            this.HideBoxBox.Size = new System.Drawing.Size(102, 16);
+            this.HideBoxBox.TabIndex = 8;
+            this.HideBoxBox.Text = "暂时隐藏框(&F)";
+            this.HideBoxBox.UseVisualStyleBackColor = true;
+            this.HideBoxBox.CheckedChanged += new System.EventHandler(this.HideBoxBox_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -273,6 +286,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DataGridView)).EndInit();
             this.ResumeLayout(false);
 
@@ -298,6 +312,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button ButtonInitAnno;
         private System.Windows.Forms.DataGridView DataGridView;
+        private System.Windows.Forms.CheckBox HideBoxBox;
     }
 }
 

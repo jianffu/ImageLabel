@@ -118,12 +118,8 @@ namespace ImageLabel
                 int jump = int.Parse(BoxJumpIndex.Text);
                 if (jump >= 0 && jump < imglib.imgCount)
                 {
-                    PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[jump]);
-                    
-                    LabelFilename.Text = "./" + imglib.imgNameList[jump];
                     index = jump;
-                    PictureBox_Draw(index);
-                    StartDataGridView();
+                    ReloadPicture();
                 }
                 else
                 {
@@ -148,9 +144,25 @@ namespace ImageLabel
                 imglib.InitializeLabels();
             }
         }
+
+        private void HideBoxBox_CheckedChanged(object sender, EventArgs e)
+        {
+            ReloadPicture();
+        }
         #endregion
 
         #region Picture Draw
+        private void ReloadPicture()
+        {
+            if (index >= imglib.imgCount || index < 0)
+                return;
+            PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[index]);
+            LabelFilename.Text = "./" + imglib.imgNameList[index];
+            if (!HideBoxBox.Checked)
+                PictureBox_Draw(index);
+            StartDataGridView();
+        }
+
         /// <summary>
         /// 更新 PictureBox 的图片.
         /// </summary>
@@ -208,7 +220,9 @@ namespace ImageLabel
         private void PictureBox_MouseClick(object sender, MouseEventArgs e)
         {
             if (PictureBox.Image is null) return;
-            int originalWidth = this.PictureBox.Image.Width;
+            if (HideBoxBox.Checked) return;
+
+            //int originalWidth = this.PictureBox.Image.Width;
             int originalHeight = this.PictureBox.Image.Height;
 
             PropertyInfo rectangleProperty = this.PictureBox.GetType().GetProperty("ImageRectangle", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -228,17 +242,19 @@ namespace ImageLabel
             double original_x = (double)zoom_x / rate;
             double original_y = (double)zoom_y / rate;
 
-            StringBuilder sb = new StringBuilder();
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat("原始尺寸{0}/{1}(宽/高)\r\n", originalWidth, originalHeight);
+            //sb.AppendFormat("缩放状态图片尺寸{0}/{1}(宽/高)\r\n", currentWidth, currentHeight);
+            //sb.AppendFormat("缩放比率{0}\r\n", rate);
+            //sb.AppendFormat("左留白宽度{0}\r\n", black_left_width);
+            //sb.AppendFormat("上留白高度{0}\r\n", black_top_height);
+            //sb.AppendFormat("当前鼠标坐标{0}/{1}(X/Y)\r\n", e.X, e.Y);
+            //sb.AppendFormat("缩放图中鼠标坐标{0}/{1}(X/Y)\r\n", zoom_x, zoom_y);
+            //sb.AppendFormat("原始图中鼠标坐标{0}/{1}(X/Y)\r\n", original_x, original_y);
+            //Console.WriteLine(sb.ToString());
 
-            sb.AppendFormat("原始尺寸{0}/{1}(宽/高)\r\n", originalWidth, originalHeight);
-            sb.AppendFormat("缩放状态图片尺寸{0}/{1}(宽/高)\r\n", currentWidth, currentHeight);
-            sb.AppendFormat("缩放比率{0}\r\n", rate);
-            sb.AppendFormat("左留白宽度{0}\r\n", black_left_width);
-            sb.AppendFormat("上留白高度{0}\r\n", black_top_height);
-            sb.AppendFormat("当前鼠标坐标{0}/{1}(X/Y)\r\n", e.X, e.Y);
-            sb.AppendFormat("缩放图中鼠标坐标{0}/{1}(X/Y)\r\n", zoom_x, zoom_y);
-            sb.AppendFormat("原始图中鼠标坐标{0}/{1}(X/Y)\r\n", original_x, original_y);
-            Console.WriteLine(sb.ToString());
+            imglib.RotateBoxLabelByClickPoint(imglib.GetBoxListByIndex(index), new Point((int)original_x, (int)original_y));
+            ButtonJumpIndex_Click(sender, e);
         }
         #endregion
 
@@ -249,7 +265,7 @@ namespace ImageLabel
             DataGridViewTextBoxColumn col1 = new DataGridViewTextBoxColumn
             {
                 Name = "No",
-                HeaderText = "序号",
+                HeaderText = "ID",
                 Width = 45,
                 ReadOnly = true
             };
@@ -272,6 +288,7 @@ namespace ImageLabel
             DataGridView.CellValueChanged -= DataGridView_CellValueChanged;//line added after solution given
             DataGridView.CellValueChanged += DataGridView_CellValueChanged;//line added after solution given
         }
+
         private void StartDataGridView()
         {
             var boxList = imglib.GetBoxListByIndex(index);

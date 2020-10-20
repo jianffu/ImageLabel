@@ -28,10 +28,9 @@ namespace ImageLabel
             p2 = bottomright;
         }
 
-        public override string ToString()
-        {
-            return string.Join(" ", new object[] { img, label, p1.X, p1.Y, p2.X, p2.Y });
-        }
+        public override string ToString() => string.Join(" ", new object[] { img, label, p1.X, p1.Y, p2.X, p2.Y });
+
+        public Rectangle ToRectangle() => new Rectangle(p1, new Size(Point.Subtract(p2, new Size(p1))));
     }
 
     class ImageLib
@@ -53,6 +52,7 @@ namespace ImageLabel
             InitializeColorDict();
         }
 
+        #region File IO
         public void ImageFromDirector(string dir)
         {
             directorPath = dir;
@@ -115,12 +115,8 @@ namespace ImageLabel
                 }
             }
         }
+        #endregion
 
-        /// <summary>
-        /// 通过图片标号获取其 boxes
-        /// </summary>
-        /// <param name="index">图片标号</param>
-        /// <returns></returns>
         public List<Box> GetBoxListByIndex(int index)
         {
             boxDict.TryGetValue(imgNameList[index], out var boxList);
@@ -134,6 +130,17 @@ namespace ImageLabel
                 foreach (var box in picBoxList)
                 {
                     box.label = classList[0];
+                }
+            }
+        }
+
+        public void RotateBoxLabelByClickPoint(List<Box> boxList, Point p)
+        {
+            foreach (Box box in boxList)
+            {
+                if (box.ToRectangle().Contains(p))
+                {
+                    box.label = classList[(classList.IndexOf(box.label) + 1) % classList.Count];
                 }
             }
         }
