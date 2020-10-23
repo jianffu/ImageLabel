@@ -157,7 +157,10 @@ namespace ImageLabel
             if (index >= imglib.imgCount || index < 0)
                 return;
             PictureBox.Image = Image.FromFile(imglib.directorPath + imglib.imgNameList[index]);
-            LabelFilename.Text = "./" + imglib.imgNameList[index];
+            int imgCount = imglib.imgNameList.Count;
+            float percent = index / (float)imgCount * 100;
+            string process = index.ToString() + "/" + imgCount.ToString() + "（" + percent.ToString("0.0") + "%)  ";
+            LabelFilename.Text = process + "./" + imglib.imgNameList[index];
             if (!HideBoxBox.Checked)
                 PictureBox_Draw(index);
             StartDataGridView();
@@ -284,7 +287,7 @@ namespace ImageLabel
 
             col2.DisplayIndex = 1;
             DataGridView.Columns.Insert(1, col2);
-            //dataGridView1.Rows[1].Cells[1].Value = imglib.classList[2];
+            
             DataGridView.CellValueChanged -= DataGridView_CellValueChanged;//line added after solution given
             DataGridView.CellValueChanged += DataGridView_CellValueChanged;//line added after solution given
         }
