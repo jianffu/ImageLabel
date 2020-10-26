@@ -225,7 +225,7 @@ namespace ImageLabel
             if (PictureBox.Image is null) return;
             if (HideBoxBox.Checked) return;
 
-            //int originalWidth = this.PictureBox.Image.Width;
+            int originalWidth = this.PictureBox.Image.Width;
             int originalHeight = this.PictureBox.Image.Height;
 
             PropertyInfo rectangleProperty = this.PictureBox.GetType().GetProperty("ImageRectangle", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -253,7 +253,7 @@ namespace ImageLabel
             //sb.AppendFormat("上留白高度{0}\r\n", black_top_height);
             //sb.AppendFormat("当前鼠标坐标{0}/{1}(X/Y)\r\n", e.X, e.Y);
             //sb.AppendFormat("缩放图中鼠标坐标{0}/{1}(X/Y)\r\n", zoom_x, zoom_y);
-            //sb.AppendFormat("原始图中鼠标坐标{0}/{1}(X/Y)\r\n", original_x, original_y);
+            //sb.AppendFormat("原始图中鼠标坐标{0}/{1}(X/Y)\r\n", original_x.ToString("0.00"), original_y.ToString("0.00"));
             //Console.WriteLine(sb.ToString());
 
             imglib.RotateBoxLabelByClickPoint(imglib.GetBoxListByIndex(index), new Point((int)original_x, (int)original_y));
